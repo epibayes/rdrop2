@@ -156,7 +156,7 @@ drop_upload <- function(file,
             response$server_modified
           )
         )
-
+        last_chunk_length = length(chunk)
       } else {
         req = httr::POST(
           url = paste(put_session_url, "finish", sep = '/'),
@@ -171,7 +171,7 @@ drop_upload <- function(file,
                   path = path
                 ),
                 cursor = list(
-                  offset = (chunk_index - 1) * 140 * 10^6 + length(chunk),
+                  offset = (chunk_index - 1) * 140 * 10^6 + last_chunk_length,
                   session_id = session_id
                 )
               ),
