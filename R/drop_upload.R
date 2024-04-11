@@ -171,7 +171,7 @@ drop_upload <- function(file,
                   path = path
                 ),
                 cursor = list(
-                  offset = (chunk_index - 1) * 140 * 10^6,
+                  offset = (chunk_index - 1) * 140 * 10^6 + length(chunk),
                   session_id = session_id
                 )
               ),
