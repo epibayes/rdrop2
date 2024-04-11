@@ -37,6 +37,7 @@ drop_upload <- function(file,
                         dtoken = get_dropbox_token()) {
   put_url <- "https://content.dropboxapi.com/2/files/upload"
 
+  put_session_url <- "https://content.dropboxapi.com/2/files/upload_session"
   # Check that object exists locally before adding slashes
   # assertive::assert_all_are_existing_files(file, severity = ("stop"))
   assertthat::assert_that(file.exists(file))
@@ -53,39 +54,145 @@ drop_upload <- function(file,
     path <- paste0("/", strip_slashes(path), "/", basename(file))
   }
 
-  req <- httr::POST(
-    url = put_url,
-    httr::config(token = dtoken),
-    httr::add_headers("Dropbox-API-Arg" = jsonlite::toJSON(
-      list(
-        path = path,
-        mode = mode,
-        autorename = autorename,
-        mute = mute
-      ),
-      auto_unbox = TRUE
-    )),
-    body = httr::upload_file(file, type = "application/octet-stream")
-    # application/octet-stream is to save to a file to disk and not worry about
-    # what application/function might handle it. This lets another application
-    # figure out how to read it. So for this purpose we're totally ok.
-  )
-  httr::stop_for_status(req)
-  response <- httr::content(req)
-
-  if (verbose) {
-    pretty_lists(response)
-    invisible(response)
-  } else {
-    invisible(response)
-    message(
-      sprintf(
-        'File %s uploaded as %s successfully at %s',
-        file,
-        response$path_display,
-        response$server_modified
-      )
+  file_size = file.size(file)
+  if (file_size < 140 * 10^6) {
+    req <- httr::POST(
+      url = put_url,
+      httr::config(token = dtoken),
+      httr::add_headers("Dropbox-API-Arg" = jsonlite::toJSON(
+        list(
+          path = path,
+          mode = mode,
+          autorename = autorename,
+          mute = mute
+        ),
+        auto_unbox = TRUE
+      )),
+      body = httr::upload_file(file, type = "application/octet-stream")
+      # application/octet-stream is to save to a file to disk and not worry about
+      # what application/function might handle it. This lets another application
+      # figure out how to read it. So for this purpose we're totally ok.
     )
+    httr::stop_for_status(req)
+    response <- httr::content(req)
+
+    if (verbose) {
+      pretty_lists(response)
+      invisible(response)
+    } else {
+      invisible(response)
+      message(
+        sprintf(
+          'File %s uploaded as %s successfully at %s',
+          file,
+          response$path_display,
+          response$server_modified
+        )
+      )
+    }
+  } else {
+    file_handle = file(file, raw = TRUE, open = 'rb')
+    chunk = readBin(con = f, what = 'raw', n = 140 * 10^6)
+    chunk_index = 1
+    req = httr::POST(
+      url = paste(put_session_url, "start", sep = '/'),
+      httr::config(token = dtoken),
+      httr::add_headers(
+        "Dropbox-API-Arg" = jsonlite::toJSON(
+          list(
+            close = FALSE
+          ),
+          auto_unbox = TRUE),
+        "Content-Type" = "application/octet-stream"
+      ),
+      body = chunk
+    )
+
+    httr::stop_for_status(req)
+    response <- httr::content(req)
+    session_id = response$session_id
+    
+    if (verbose) {
+      pretty_lists(response)
+      invisible(response)
+    } else {
+      invisible(response)
+      message(
+        sprintf(
+          'File %s upload session started as %s successfully at %s',
+          file,
+          response$path_display,
+          response$server_modified
+        )
+      )
+    }    
+    while(TRUE) {
+      chunk = readBin(con = f, what = 'raw', n = 140 * 10^6)
+      if (length(chunk) > 0) {
+        chunk_index = chunk_index + 1
+        req = httr::POST(
+          url = paste(put_session_url, "append", sep = '/'),
+          httr::config(token = dtoken),
+          httr::add_headers("Dropbox-API-Arg" = jsonlite::toJSON(
+            "Dropbox-API-Arg" = jsonlite::toJSON(
+              list(
+                close = FALSE,
+                cursor = list(
+                  offset = (chunk_index - 1) * 140 * 10^6,
+                  session_id = session_id
+                )
+              ),
+              auto_unbox = TRUE),
+            "Content-Type" = "application/octet-stream"
+          ),
+          body = chunk
+        )
+           
+        httr::stop_for_status(req)
+        response <- httr::content(req)
+
+        if (verbose) {
+          pretty_lists(response)
+          invisible(response)
+        } else {
+          invisible(response)
+          message(
+            sprintf(
+              'File %s uploaded chunk %s as %s successfully at %s',
+              file,
+              chunk_index,
+              response$path_display,
+              response$server_modified
+            )
+          )
+        }      
+      } else {
+        req = httr::POST(
+          url = paste(put_session_url, "finish", sep = '/'),
+          httr::config(token = dtoken),
+          httr::add_headers("Dropbox-API-Arg" = jsonlite::toJSON(
+            "Dropbox-API-Arg" = jsonlite::toJSON(
+              list(
+                commit = list(
+                  autorename = autorename,
+                  mode = mode,
+                  mute = mute,
+                  path = path
+                ),
+                cursor = list(
+                  offset = (chunk_index - 1) * 140 * 10^6,
+                  session_id = session_id
+                )
+              ),
+              auto_unbox = TRUE),
+            "Content-Type" = "application/octet-stream"
+          ),
+          body = chunk
+        )
+
+        close(f); break
+      }
+    }
   }
 
 }
