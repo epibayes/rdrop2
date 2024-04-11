@@ -131,7 +131,7 @@ drop_upload <- function(file,
       if (length(chunk) > 0) {
         chunk_index = chunk_index + 1
         req = httr::POST(
-          url = paste(put_session_url, "append", sep = '/'),
+          url = paste(put_session_url, "append_v2", sep = '/'),
           httr::config(token = dtoken),
           httr::add_headers(
             "Dropbox-API-Arg" = jsonlite::toJSON(
