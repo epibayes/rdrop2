@@ -80,7 +80,6 @@ drop_upload <- function(file,
       pretty_lists(response)
       invisible(response)
     } else {
-      invisible(response)
       message(
         sprintf(
           'File %s uploaded as %s successfully at %s',
@@ -89,6 +88,7 @@ drop_upload <- function(file,
           response$server_modified
         )
       )
+      invisible(response)
     }
   } else {
     file_handle = file(file, raw = TRUE, open = 'rb')
@@ -113,20 +113,15 @@ drop_upload <- function(file,
 #    session_id = strsplit(response$session_id, ':')[[1]][2]
     session_id = response$session_id
     
-    if (verbose) {
-      pretty_lists(response)
-      invisible(response)
-    } else {
-      invisible(response)
-      message(
-        sprintf(
-          'File %s upload session started as %s successfully at %s',
-          file,
-          response$path_display,
-          response$server_modified
-        )
+    message(
+      sprintf(
+        'File %s upload session started as %s successfully at %s',
+        file,
+        response$path_display,
+        response$server_modified
       )
-    }    
+    )
+
     while(TRUE) {
       chunk = readBin(con = file_handle, what = 'raw', n = 140 * 10^6)
       if (length(chunk) > 0) {
@@ -152,21 +147,16 @@ drop_upload <- function(file,
         httr::stop_for_status(req)
         response <- httr::content(req)
 
-        if (verbose) {
-          pretty_lists(response)
-          invisible(response)
-        } else {
-          invisible(response)
-          message(
-            sprintf(
-              'File %s uploaded chunk %s as %s successfully at %s',
-              file,
-              chunk_index,
-              response$path_display,
-              response$server_modified
-            )
+        message(
+          sprintf(
+            'File %s uploaded chunk %s as %s successfully at %s',
+            file,
+            chunk_index,
+            response$path_display,
+            response$server_modified
           )
-        }      
+        )
+
       } else {
         req = httr::POST(
           url = paste(put_session_url, "finish", sep = '/'),
@@ -190,25 +180,22 @@ drop_upload <- function(file,
           ),
           body = chunk
         )
-          
+
+           
         httr::stop_for_status(req)
         response <- httr::content(req)
 
-        if (verbose) {
-          pretty_lists(response)
-          invisible(response)
-        } else {
-          invisible(response)
-          message(
-            sprintf(
-              'File %s uploaded as %s finalized at %s',
-              file,
-              response$path_display,
-              response$server_modified
-            )
+        close(file_handle);         
+        message(
+          sprintf(
+            'File %s uploaded chunk %s as %s successfully at %s',
+            file,
+            chunk_index,
+            response$path_display,
+            response$server_modified
           )
-        }      
-        close(file_handle); break
+       )
+       break
       }
     }
   }
