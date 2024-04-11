@@ -133,7 +133,7 @@ drop_upload <- function(file,
         req = httr::POST(
           url = paste(put_session_url, "append", sep = '/'),
           httr::config(token = dtoken),
-          httr::add_headers("Dropbox-API-Arg" = jsonlite::toJSON(
+          httr::add_headers(
             "Dropbox-API-Arg" = jsonlite::toJSON(
               list(
                 close = FALSE,
@@ -170,7 +170,7 @@ drop_upload <- function(file,
         req = httr::POST(
           url = paste(put_session_url, "finish", sep = '/'),
           httr::config(token = dtoken),
-          httr::add_headers("Dropbox-API-Arg" = jsonlite::toJSON(
+          httr::add_headers(
             "Dropbox-API-Arg" = jsonlite::toJSON(
               list(
                 commit = list(
