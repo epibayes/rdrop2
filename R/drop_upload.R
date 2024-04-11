@@ -190,8 +190,25 @@ drop_upload <- function(file,
           ),
           body = chunk
         )
+          
+        httr::stop_for_status(req)
+        response <- httr::content(req)
 
-        close(f); break
+        if (verbose) {
+          pretty_lists(response)
+          invisible(response)
+        } else {
+          invisible(response)
+          message(
+            sprintf(
+              'File %s uploaded as %s finalized at %s',
+              file,
+              response$path_display,
+              response$server_modified
+            )
+          )
+        }      
+        close(file_handle); break
       }
     }
   }
