@@ -110,7 +110,7 @@ drop_upload <- function(file,
 
     httr::stop_for_status(req)
     response <- httr::content(req)
-    session_id = response$session_id
+    session_id = strsplit(response$session_id, ':')[[1]][2]
     
     if (verbose) {
       pretty_lists(response)
