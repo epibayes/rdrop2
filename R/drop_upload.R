@@ -178,7 +178,7 @@ drop_upload <- function(file,
               auto_unbox = TRUE),
             "Content-Type" = "application/octet-stream"
           ),
-          body = chunk
+          body = ""
         )
 
            
