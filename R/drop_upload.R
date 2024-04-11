@@ -92,7 +92,7 @@ drop_upload <- function(file,
     }
   } else {
     file_handle = file(file, raw = TRUE, open = 'rb')
-    chunk = readBin(con = f, what = 'raw', n = 140 * 10^6)
+    chunk = readBin(con = file_handle, what = 'raw', n = 140 * 10^6)
     chunk_index = 1
     req = httr::POST(
       url = paste(put_session_url, "start", sep = '/'),
@@ -127,7 +127,7 @@ drop_upload <- function(file,
       )
     }    
     while(TRUE) {
-      chunk = readBin(con = f, what = 'raw', n = 140 * 10^6)
+      chunk = readBin(con = file_handle, what = 'raw', n = 140 * 10^6)
       if (length(chunk) > 0) {
         chunk_index = chunk_index + 1
         req = httr::POST(
