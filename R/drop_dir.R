@@ -142,7 +142,7 @@ drop_list_folder <- function(
     url = url,
     httr::config(token = dtoken),
     httr::add_headers(paste('Dropbox-API-Path-Root: {".tag": "root", "root": "', root_namespace_id, '
-    "}')
+    "}')),
     body = purrr::discard(list(
       path = path,
       recursive = recursive,
@@ -178,7 +178,7 @@ drop_list_folder_continue <- function(cursor, dtoken = get_dropbox_token(), root
     url = url,
     httr::config(token = dtoken),
     httr::add_headers(paste('Dropbox-API-Path-Root: {".tag": "root", "root": "', root_namespace_id, '
-    "}'),
+    "}')),
     body = list(cursor = cursor),
     encode = "json"
   )
@@ -216,7 +216,7 @@ drop_list_folder_get_latest_cursor <- function(
     url = url,
     httr::config(token = dtoken),    
     httr::add_headers(paste('Dropbox-API-Path-Root: {".tag": "root", "root": "', root_namespace_id, '
-    "}'),
+    "}')),
     body = purrr::discard(list(
       path = path,
       recursive = recursive,
