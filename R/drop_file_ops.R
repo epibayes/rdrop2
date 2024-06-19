@@ -49,15 +49,14 @@ drop_copy <-
 
     # Copying a folder to an existing filename will result in a HTTP 409 (conflict error)
 
-    args <- drop_compact(
+    args <- purrr::discard(
       list(
         from_path = from_path,
         to_path = to_path,
         allow_shared_folder = allow_shared_folder,
         autorename = autorename,
         allow_ownership_transfer = allow_ownership_transfer
-      )
-    )
+      ), is.null)
 
     if (drop_exists(from_path)) {
       # copy
@@ -129,16 +128,15 @@ drop_move <-
 
     # Moving a folder to an existing filename will result in a HTTP 409 (conflict error)
 
-    args <- drop_compact(
+    args <- purrr::discard(
       list(
         from_path = from_path,
         to_path = to_path,
         allow_shared_folder = allow_shared_folder,
         autorename = autorename,
         allow_ownership_transfer = allow_ownership_transfer
-      )
-    )
-
+      ), is.null)
+    
     if (drop_exists(from_path)) {
       # move
       x <-

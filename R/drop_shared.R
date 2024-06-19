@@ -42,13 +42,12 @@ drop_share <- function(path = NULL,
   # exists on Dropbox before proceeding
 
   settings <-
-    drop_compact(
+    purrr::discard(
       list(
         requested_visibility = requested_visibility,
         link_password = link_password,
         expires = expires
-      )
-    )
+      ), is.null)
   #  TODO: Check to see if this is necessary when we have encode to json below
   share_url <-
     "https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings"

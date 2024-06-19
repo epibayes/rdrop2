@@ -41,7 +41,8 @@ drop_dir <- function(
   include_mounted_folders = TRUE,
   limit = NULL,
   cursor = FALSE,
-  dtoken = get_dropbox_token()
+  dtoken = get_dropbox_token(),
+  root_namespace_id = drop_root_namespace_id()
 ) {
 
   # check args
@@ -59,7 +60,7 @@ drop_dir <- function(
   if (is.character(cursor)) {
 
     # list changes since cursor
-    content <- drop_list_folder_continue(cursor, dtoken)
+    content <- drop_list_folder_continue(cursor, dtoken, root_namespace_id)
 
   } else if (cursor) {
 
@@ -72,7 +73,8 @@ drop_dir <- function(
       include_has_explicit_shared_members,
       include_mounted_folders,
       limit,
-      dtoken
+      dtoken,
+      root_namespace_id
     )
     return(content$cursor)
 
@@ -87,7 +89,8 @@ drop_dir <- function(
       include_has_explicit_shared_members,
       include_mounted_folders,
       limit,
-      dtoken
+      dtoken,
+      root_namespace_id
     )
 
   }
@@ -129,7 +132,8 @@ drop_list_folder <- function(
   include_has_explicit_shared_members = FALSE,
   include_mounted_folders = TRUE,
   limit = NULL,
-  dtoken = get_dropbox_token()
+  dtoken = get_dropbox_token(),  
+  root_namespace_id = drop_root_namespace_id()
 ) {
 
   url <- "https://api.dropboxapi.com/2/files/list_folder"
@@ -137,7 +141,9 @@ drop_list_folder <- function(
   req <- httr::POST(
     url = url,
     httr::config(token = dtoken),
-    body = drop_compact(list(
+    httr::add_headers(paste('Dropbox-API-Path-Root: {".tag": "root", "root": "', root_namespace_id, '
+    "}')
+    body = purrr::discard(list(
       path = path,
       recursive = recursive,
       include_media_info = include_media_info,
@@ -145,7 +151,7 @@ drop_list_folder <- function(
       include_has_explicit_shared_members = include_has_explicit_shared_members,
       include_mounted_folders = include_mounted_folders,
       limit = limit
-    )),
+    ), is.null),
     encode = "json"
   )
 
@@ -164,13 +170,15 @@ drop_list_folder <- function(
 #' @noRd
 #'
 #' @keywords internal
-drop_list_folder_continue <- function(cursor, dtoken = get_dropbox_token()) {
+drop_list_folder_continue <- function(cursor, dtoken = get_dropbox_token(), root_namespace_id = drop_root_namespace_id()) {
 
   url <- "https://api.dropboxapi.com/2/files/list_folder/continue"
 
   req <- httr::POST(
     url = url,
     httr::config(token = dtoken),
+    httr::add_headers(paste('Dropbox-API-Path-Root: {".tag": "root", "root": "', root_namespace_id, '
+    "}'),
     body = list(cursor = cursor),
     encode = "json"
   )
@@ -198,15 +206,18 @@ drop_list_folder_get_latest_cursor <- function(
   include_has_explicit_shared_members = FALSE,
   include_mounted_folders = TRUE,
   limit = NULL,
-  dtoken = get_dropbox_token()
+  dtoken = get_dropbox_token(),
+  root_namespace_id = drop_root_namespace_id()
 ) {
 
   url <- "https://api.dropboxapi.com/2/files/list_folder/get_latest_cursor"
 
   req <- httr::POST(
     url = url,
-    httr::config(token = dtoken),
-    body = drop_compact(list(
+    httr::config(token = dtoken),    
+    httr::add_headers(paste('Dropbox-API-Path-Root: {".tag": "root", "root": "', root_namespace_id, '
+    "}'),
+    body = purrr::discard(list(
       path = path,
       recursive = recursive,
       include_media_info = include_media_info,
@@ -214,7 +225,7 @@ drop_list_folder_get_latest_cursor <- function(
       include_has_explicit_shared_members = include_has_explicit_shared_members,
       include_mounted_folders = include_mounted_folders,
       limit = limit
-    )),
+    ), is.null),
     encode = "json"
   )
 

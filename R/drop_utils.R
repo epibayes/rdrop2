@@ -8,12 +8,6 @@
 #' @usage lhs \%>\% rhs
 NULL
 
-
-#' A local version of list compact from plyr.
-#' @noRd
-drop_compact <- function(l) Filter(Negate(is.null), l)
-
-
 #' @noRd
 # This is an internal function to linearize lists
 # Source: https://gist.github.com/mrdwab/4205477

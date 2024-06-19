@@ -36,15 +36,14 @@ drop_search <- function(query,
   assertthat::assert_that(start >= 0,
                           max_results >= 0)
 
-  args <- drop_compact(
+  args <- purrr::discard(
     list(
       query = query,
       path = path,
       start = as.integer(start),
       max_results = as.integer(max_results),
       mode = mode
-    )
-  )
+    ), is.null)
 
   search_url <- "https://api.dropboxapi.com/2/files/search"
   res <-
