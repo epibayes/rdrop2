@@ -21,7 +21,6 @@ drop_media <- function(path = NULL, dtoken = get_dropbox_token()) {
 
   if(drop_exists(path)) {
     media_url <- "https://api.dropbox.com/2/files/get_temporary_link"
-    path <- add_slashes(path)
     res <- POST(media_url, body = list(path = path), httr::config(token = dtoken), encode = "json")
     content(res)
   } else {

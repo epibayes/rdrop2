@@ -52,10 +52,6 @@ drop_dir <- function(
                           is.null(limit) || is.numeric(limit),
                           class(cursor) %in% c("logical", "character"))
 
-  # this API doesn't accept "/", so don't add slashes to empty path, remove if given
-  if (path != "") path <- add_slashes(path)
-  if (path == "/") path <- ""
-
   # force limit to integer
   if (!is.null(limit)) limit <- as.integer(limit)
 

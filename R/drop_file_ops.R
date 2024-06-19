@@ -30,9 +30,6 @@ drop_copy <-
            dtoken = get_dropbox_token())  {
     copy_url <- "https://api.dropboxapi.com/2/files/copy_v2"
 
-    from_path <- add_slashes(from_path)
-    to_path <- add_slashes(to_path)
-
     # Copying a file into a folder
     file_to_folder <-
       c(drop_type(from_path) == "file",
@@ -113,9 +110,6 @@ drop_move <-
            dtoken = get_dropbox_token())  {
     move_url <- "https://api.dropboxapi.com/2/files/move_v2"
 
-    from_path <- add_slashes(from_path)
-    to_path <- add_slashes(to_path)
-
     # Moving a file into a folder
     file_to_folder <-
       c(drop_type(from_path) == "file",
@@ -180,7 +174,6 @@ drop_delete <-
             dtoken = get_dropbox_token()) {
     create_url <- "https://api.dropboxapi.com/2/files/delete_v2"
     if (drop_exists(path)) {
-      path <- add_slashes(path)
       x <-
         httr::POST(
           create_url,
@@ -226,7 +219,6 @@ drop_create <-
     if (!drop_exists(path) || autorename) {
       create_url <- "https://api.dropboxapi.com/2/files/create_folder_v2"
 
-      path <- add_slashes(path)
       x <-
         httr::POST(
           create_url,
@@ -279,8 +271,6 @@ drop_exists <- function(path = NULL, dtoken = get_dropbox_token()) {
   #assertive::assert_is_not_null(path)
   assertthat::assert_that(!is.null(path))
 
-  if (!grepl('^/', path))
-    path <- paste0("/", path)
   dir_name <- suppressMessages(dirname(path))
   # In issue #142, this part below (the drop_dir call) fails when drop_dir is
   # looking to see if a second level folder exists (when it doesn't.) One safe

@@ -14,29 +14,6 @@ NULL
 drop_compact <- function(l) Filter(Negate(is.null), l)
 
 
-#' A small function to strip trailing slashes from a path
-#' @noRd
-strip_slashes <- function(path) {
-    if (length(path) && grepl("/$", path)) {
-        path <- substr(path, 1, nchar(path) - 1)
-    }
-    # Also remove leading slashes
-  if (length(path) && grepl("^/", path)) {
-    path <- substr(path, 2, nchar(path))
-  }
-
-    path
-}
-
-#' A small function to add a prefix slash
-#' @noRd
-add_slashes <- function(path) {
-  if (length(path) && !grepl("^/", path)) {
-    path <- paste0("/", path)
-  }
-  path
-}
-
 #' @noRd
 # This is an internal function to linearize lists
 # Source: https://gist.github.com/mrdwab/4205477

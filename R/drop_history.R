@@ -52,7 +52,7 @@ drop_list_revisions <- function(path, limit = 10, dtoken = get_dropbox_token()) 
     url = url,
     httr::config(token = dtoken),
     body = list(
-      path = add_slashes(path),
+      path = path,
       limit = limit
     ),
     encode = "json"

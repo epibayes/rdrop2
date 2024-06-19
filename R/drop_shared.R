@@ -41,7 +41,6 @@ drop_share <- function(path = NULL,
   # Once the new drop_exists is done, one must check to see if a file/folder
   # exists on Dropbox before proceeding
 
-  path <- add_slashes(path)
   settings <-
     drop_compact(
       list(

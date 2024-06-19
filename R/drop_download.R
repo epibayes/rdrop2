@@ -36,9 +36,6 @@ drop_download <- function(
   dtoken = get_dropbox_token()
 ) {
 
-  # if path isn't an id or revision, ensure it has leading slash
-  if (!grepl("^(id|rev):", path)) path <- add_slashes(path)
-
   # if no local path given, download it to working directory
   # if path given is folder, append filename to it
   if (is.null(local_path)) {

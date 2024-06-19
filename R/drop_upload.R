@@ -47,13 +47,6 @@ drop_upload <- function(file,
   # assertive::assert_any_are_matching_fixed(standard_modes, mode)
   assertthat::assert_that(mode %in% standard_modes)
 
-  # Dropbox API requires a / before an object name.
-  if (is.null(path)) {
-    path <- add_slashes(basename(file))
-  } else {
-    path <- paste0("/", strip_slashes(path), "/", basename(file))
-  }
-
   file_size = file.size(file)
   if (file_size < 140 * 10^6) {
     req <- httr::POST(
@@ -149,9 +142,8 @@ drop_upload <- function(file,
 
         message(
           sprintf(
-            'File %s uploaded chunk %s as %s successfully at %s',
+            'File %s uploaded as %s successfully at %s',
             file,
-            chunk_index,
             response$path_display,
             response$server_modified
           )
