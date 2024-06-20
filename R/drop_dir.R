@@ -150,7 +150,7 @@ drop_list_folder <- function(
       include_has_explicit_shared_members = include_has_explicit_shared_members,
       include_mounted_folders = include_mounted_folders,
       limit = limit
-    ), is.null))
+    ), is.null), auto_unbox = TRUE)
   )
 
   httr::stop_for_status(req)
@@ -176,7 +176,7 @@ drop_list_folder_continue <- function(cursor, dtoken = get_dropbox_token(), root
     url = url,
     httr::config(token = dtoken),
     httr::add_headers("Dropbox-API-Path-Root" = paste0("{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"), "Content-Type" = "application/json"),
-    body = jsonlite::toJSON(list(cursor = cursor))
+    body = jsonlite::toJSON(list(cursor = cursor), auto_unbox = TRUE)
   )
 
   httr::stop_for_status(req)
@@ -220,7 +220,7 @@ drop_list_folder_get_latest_cursor <- function(
       include_has_explicit_shared_members = include_has_explicit_shared_members,
       include_mounted_folders = include_mounted_folders,
       limit = limit
-    ), is.null))
+    ), is.null), auto_unbox = TRUE)
   )
 
   httr::stop_for_status(req)
