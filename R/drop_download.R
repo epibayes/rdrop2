@@ -33,7 +33,8 @@ drop_download <- function(
   overwrite = FALSE,
   progress = interactive(),
   verbose = interactive(),
-  dtoken = get_dropbox_token()
+  dtoken = get_dropbox_token(),
+  root_namespace_id = drop_root_namespace_id()
 ) {
 
   # if no local path given, download it to working directory
@@ -49,12 +50,15 @@ drop_download <- function(
   req <- httr::POST(
     url = url,
     httr::config(token = dtoken),
-    httr::add_headers("Dropbox-API-Arg" = jsonlite::toJSON(
-      list(
-        path = path
-      ),
-      auto_unbox = TRUE
-    )),
+    httr::add_headers(
+      "Dropbox-API-Path-Root" = paste0(
+        "{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"),      
+      "Dropbox-API-Arg" = jsonlite::toJSON(
+        list(
+          path = path
+        ),
+        auto_unbox = TRUE)
+    ),
     if (progress) httr::progress(),
     httr::write_disk(local_path, overwrite)
   )
