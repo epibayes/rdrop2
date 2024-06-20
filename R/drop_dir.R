@@ -141,8 +141,7 @@ drop_list_folder <- function(
   req <- httr::POST(
     url = url,
     httr::config(token = dtoken),
-    httr::add_headers(paste('Dropbox-API-Path-Root: {".tag": "root", "root": "', root_namespace_id, '
-    "}')),
+    httr::add_headers("Dropbox-API-Path-Root" = paste0("{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"), "Content-Type" = "application/json")
     body = purrr::discard(list(
       path = path,
       recursive = recursive,
@@ -151,8 +150,7 @@ drop_list_folder <- function(
       include_has_explicit_shared_members = include_has_explicit_shared_members,
       include_mounted_folders = include_mounted_folders,
       limit = limit
-    ), is.null),
-    encode = "json"
+    ), is.null)
   )
 
   httr::stop_for_status(req)
@@ -177,10 +175,8 @@ drop_list_folder_continue <- function(cursor, dtoken = get_dropbox_token(), root
   req <- httr::POST(
     url = url,
     httr::config(token = dtoken),
-    httr::add_headers(paste('Dropbox-API-Path-Root: {".tag": "root", "root": "', root_namespace_id, '
-    "}')),
-    body = list(cursor = cursor),
-    encode = "json"
+    httr::add_headers("Dropbox-API-Path-Root" = paste0("{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"), "Content-Type" = "application/json")
+    body = list(cursor = cursor)
   )
 
   httr::stop_for_status(req)
@@ -215,8 +211,7 @@ drop_list_folder_get_latest_cursor <- function(
   req <- httr::POST(
     url = url,
     httr::config(token = dtoken),    
-    httr::add_headers(paste('Dropbox-API-Path-Root: {".tag": "root", "root": "', root_namespace_id, '
-    "}')),
+    httr::add_headers("Dropbox-API-Path-Root" = paste0("{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"), "Content-Type" = "application/json")
     body = purrr::discard(list(
       path = path,
       recursive = recursive,
@@ -225,8 +220,7 @@ drop_list_folder_get_latest_cursor <- function(
       include_has_explicit_shared_members = include_has_explicit_shared_members,
       include_mounted_folders = include_mounted_folders,
       limit = limit
-    ), is.null),
-    encode = "json"
+    ), is.null)
   )
 
   httr::stop_for_status(req)
