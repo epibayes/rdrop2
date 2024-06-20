@@ -141,7 +141,7 @@ drop_list_folder <- function(
   req <- httr::POST(
     url = url,
     httr::config(token = dtoken),
-    httr::add_headers("Dropbox-API-Path-Root" = paste0("{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"), "Content-Type" = "application/json")
+    httr::add_headers("Dropbox-API-Path-Root" = paste0("{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"), "Content-Type" = "application/json"),
     body = purrr::discard(list(
       path = path,
       recursive = recursive,
@@ -175,7 +175,7 @@ drop_list_folder_continue <- function(cursor, dtoken = get_dropbox_token(), root
   req <- httr::POST(
     url = url,
     httr::config(token = dtoken),
-    httr::add_headers("Dropbox-API-Path-Root" = paste0("{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"), "Content-Type" = "application/json")
+    httr::add_headers("Dropbox-API-Path-Root" = paste0("{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"), "Content-Type" = "application/json"),
     body = list(cursor = cursor)
   )
 
@@ -211,7 +211,7 @@ drop_list_folder_get_latest_cursor <- function(
   req <- httr::POST(
     url = url,
     httr::config(token = dtoken),    
-    httr::add_headers("Dropbox-API-Path-Root" = paste0("{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"), "Content-Type" = "application/json")
+    httr::add_headers("Dropbox-API-Path-Root" = paste0("{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"), "Content-Type" = "application/json"),
     body = purrr::discard(list(
       path = path,
       recursive = recursive,
