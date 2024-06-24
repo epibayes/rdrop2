@@ -25,7 +25,9 @@ drop_search <- function(query,
                         start = 0,
                         max_results = 100,
                         mode = "filename",
-                        dtoken = get_dropbox_token()) {
+                        dtoken = get_dropbox_token(),
+                        root_namespace_id = drop_root_namespace_id()
+) {
   available_modes <-
     c("filename", "filename_and_content", "deleted_filename")
   # assertive::assert_any_are_matching_fixed(available_modes, mode)
@@ -47,10 +49,14 @@ drop_search <- function(query,
 
   search_url <- "https://api.dropboxapi.com/2/files/search"
   res <-
-    httr::POST(search_url,
-               body = args,
-               httr::config(token = dtoken),
-               encode = "json")
+    httr::POST(
+      url = search_url,
+      httr::add_headers(
+        "Dropbox-API-Path-Root" = paste0(
+          "{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"),      
+        "Dropbox-API-Arg" = jsonlite::toJSON(list(path = path), auto_unbox = TRUE)),
+      body = args,
+      httr::config(token = dtoken))
   httr::stop_for_status(res)
   httr::content(res)
   # TODO
