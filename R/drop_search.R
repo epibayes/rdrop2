@@ -38,23 +38,23 @@ drop_search <- function(query,
   assertthat::assert_that(start >= 0,
                           max_results >= 0)
 
-  args <- purrr::discard(
+  args <- jsonlite::toJSON(purrr::discard(
     list(
       query = query,
       path = path,
       start = as.integer(start),
       max_results = as.integer(max_results),
       mode = mode
-    ), is.null)
+    ), is.null), auto_unbox = TRUE)
 
-  search_url <- "https://api.dropboxapi.com/2/files/search"
+  search_url <- "https://api.dropboxapi.com/2/files/search_v2"
   res <-
     httr::POST(
       url = search_url,
       httr::add_headers(
         "Dropbox-API-Path-Root" = paste0(
-          "{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"),      
-        "Dropbox-API-Arg" = jsonlite::toJSON(list(path = path), auto_unbox = TRUE)),
+          "{\".tag\": \"root\", \"root\": \"", root_namespace_id, "\"}"),
+        "Content-Type" = "application/json"),      
       body = args,
       httr::config(token = dtoken))
   httr::stop_for_status(res)
